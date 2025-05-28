@@ -85,3 +85,4 @@ const Contact = () => {
 };
 
 export default Contact;
+ <p className="text-xs text-gray-400 mt-4">Version: 0.1.3-dev</p>
