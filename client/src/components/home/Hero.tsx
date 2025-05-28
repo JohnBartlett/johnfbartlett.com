@@ -16,7 +16,7 @@ const Hero = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl fade-in">
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white leading-tight mb-4">
-              Strategic AI Implementation for Business Transformation
+              Strategic AI Implementation for Business Growth
             </h1>
             <p className="text-lg md:text-xl text-white opacity-90 mb-8">
               JF Bartlett & Associates helps businesses in St. Petersburg and beyond harness the power of artificial intelligence to solve real business challenges.
