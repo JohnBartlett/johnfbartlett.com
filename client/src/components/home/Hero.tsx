@@ -6,7 +6,7 @@ const Hero = () => {
       {/* Modern office with technology screens displaying AI visualizations */}
       <img 
         src="https://pixabay.com/get/gd1e0f8efb6621e93d029119c5fea84c53c39989a4e51ced8bb3db6138ebfff20b14f841d54d7f30149e8169dc565571a9db550dcf1c7d0214eb678e54c65083d_1280.jpg" 
-        alt="Modern office with AI technology displays" 
+        alt="" 
         className="w-full h-[60vh] md:h-[80vh] object-cover"
       />
       
