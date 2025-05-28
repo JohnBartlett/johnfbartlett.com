@@ -25,10 +25,12 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
     const { name, company, email, phone, message, honey, privacy } = req.body;
 
+    // Honeypot spam filter
     if (honey) {
       return res.status(200).json({ message: 'Thanks for your submission.' });
     }
 
+    // Basic validation
     if (!name || !email || !message || !company) {
       return res.status(400).json({ error: 'Missing required fields.' });
     }
@@ -36,12 +38,6 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Invalid email format.' });
-    }
-
-    // Phone: optional, but validate if provided
-    const phoneRegex = /^[0-9\s\-()+]*$/;
-    if (phone && !phoneRegex.test(phone)) {
-      return res.status(400).json({ error: 'Invalid phone format.' });
     }
 
     if (!privacy) {
