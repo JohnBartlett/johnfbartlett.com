@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { apiRequest } from '@/lib/queryClient';
 import { useToast } from '@/hooks/use-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,7 +16,8 @@ const contactFormSchema = z.object({
   email: z.string().email({ message: 'Please enter a valid email address.' }),
   phone: z.string().optional(),
   message: z.string().min(10, { message: 'Message must be at least 10 characters.' }),
-  privacy: z.boolean().refine(val => val === true, { message: 'You must accept the Privacy Policy and Terms of Service.' })
+  privacy: z.boolean().refine(val => val === true, { message: 'You must accept the Privacy Policy and Terms of Service.' }),
+  honey: z.string().optional(), // Honeypot field
 });
 
 type ContactFormValues = z.infer<typeof contactFormSchema>;
@@ -25,7 +25,7 @@ type ContactFormValues = z.infer<typeof contactFormSchema>;
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  
+
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
     defaultValues: {
@@ -34,24 +34,40 @@ const ContactForm = () => {
       email: '',
       phone: '',
       message: '',
-      privacy: false
-    }
+      privacy: false,
+      honey: '',
+    },
   });
 
   const onSubmit = async (data: ContactFormValues) => {
+    if (data.honey) {
+      // Bot detected, silently fail
+      return;
+    }
+
     setIsSubmitting(true);
     try {
-      await apiRequest('POST', '/api/contact', data);
+      const response = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const resData = await response.json();
+        throw new Error(resData.error || 'Unknown error');
+      }
+
       toast({
         title: "Success!",
         description: "Your message has been sent. We will contact you shortly.",
       });
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error",
-        description: "There was a problem sending your message. Please try again.",
-        variant: "destructive"
+        description: error.message || "There was a problem sending your message. Please try again.",
+        variant: "destructive",
       });
     } finally {
       setIsSubmitting(false);
@@ -61,9 +77,12 @@ const ContactForm = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-8">
       <h2 className="text-xl font-bold text-primary mb-6">Schedule a Consultation</h2>
-      
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Honeypot hidden field */}
+          <input type="text" {...form.register('honey')} style={{ display: 'none' }} />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
@@ -78,7 +97,6 @@ const ContactForm = () => {
                 </FormItem>
               )}
             />
-            
             <FormField
               control={form.control}
               name="company"
@@ -93,7 +111,7 @@ const ContactForm = () => {
               )}
             />
           </div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <FormField
               control={form.control}
@@ -108,7 +126,6 @@ const ContactForm = () => {
                 </FormItem>
               )}
             />
-            
             <FormField
               control={form.control}
               name="phone"
@@ -123,7 +140,7 @@ const ContactForm = () => {
               )}
             />
           </div>
-          
+
           <FormField
             control={form.control}
             name="message"
@@ -131,9 +148,9 @@ const ContactForm = () => {
               <FormItem>
                 <FormLabel>Brief description of your interest or challenges *</FormLabel>
                 <FormControl>
-                  <Textarea 
+                  <Textarea
                     placeholder="Please tell us about your business and what you're looking to achieve with AI"
-                    className="resize-none" 
+                    className="resize-none"
                     rows={5}
                     {...field}
                   />
@@ -142,7 +159,7 @@ const ContactForm = () => {
               </FormItem>
             )}
           />
-          
+
           <FormField
             control={form.control}
             name="privacy"
@@ -163,9 +180,9 @@ const ContactForm = () => {
               </FormItem>
             )}
           />
-          
-          <Button 
-            type="submit" 
+
+          <Button
+            type="submit"
             className="bg-primary hover:bg-primary-light text-white py-3 px-8 rounded-md transition"
             disabled={isSubmitting}
           >
