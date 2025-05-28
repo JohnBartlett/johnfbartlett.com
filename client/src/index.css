@@ -1,0 +1,103 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 0 0% 100%;
+  --foreground: 220 14.3% 20%;
+  --muted: 60 4.8% 95.9%;
+  --muted-foreground: 25 5.3% 44.7%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 14.3% 20%;
+  --card: 0 0% 100%;
+  --card-foreground: 220 14.3% 20%;
+  --border: 220 5.9% 90%;
+  --input: 220 5.9% 90%;
+  --primary: 212 70% 27%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 179 50% 35%;
+  --secondary-foreground: 0 0% 100%;
+  --accent: 220 14.3% 95%;
+  --accent-foreground: 220 14.3% 20%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 60 9.1% 97.8%;
+  --ring: 212 70% 27%;
+  --radius: 0.5rem;
+
+  /* Custom colors */
+  --primary-light: 210 60% 42%;
+  --neutral-light: 210 50% 98%;
+  --neutral-medium: 220 14.3% 88%;
+  --neutral-dark: 220 14.3% 35%;
+}
+
+.dark {
+  --background: 240 10% 3.9%;
+  --foreground: 0 0% 98%;
+  --muted: 240 3.7% 15.9%;
+  --muted-foreground: 240 5% 64.9%;
+  --popover: 240 10% 3.9%;
+  --popover-foreground: 0 0% 98%;
+  --card: 240 10% 3.9%;
+  --card-foreground: 0 0% 98%;
+  --border: 240 3.7% 15.9%;
+  --input: 240 3.7% 15.9%;
+  --primary: 210 60% 42%;
+  --primary-foreground: 211 100% 99%;
+  --secondary: 179 50% 35%;
+  --secondary-foreground: 0 0% 98%;
+  --accent: 240 3.7% 15.9%;
+  --accent-foreground: 0 0% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 0 0% 98%;
+  --ring: 240 4.9% 83.9%;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold text-primary;
+  }
+}
+
+@layer components {
+  .hero-gradient {
+    background: linear-gradient(135deg, rgba(26, 54, 93, 0.9) 0%, rgba(43, 108, 176, 0.8) 100%);
+  }
+  
+  .container {
+    @apply mx-auto px-4;
+  }
+  
+  .section {
+    @apply py-16;
+  }
+  
+  .btn-primary {
+    @apply bg-primary hover:bg-primary-light text-white py-2 px-4 rounded transition duration-300;
+  }
+  
+  .btn-secondary {
+    @apply bg-secondary hover:bg-opacity-90 text-white py-2 px-4 rounded transition duration-300;
+  }
+  
+  .link-hover {
+    @apply hover:text-secondary transition duration-300;
+  }
+  
+  .service-icon {
+    @apply rounded-full bg-primary bg-opacity-10 w-16 h-16 flex items-center justify-center mb-4;
+  }
+  
+  .mobile-dropdown {
+    @apply border-b border-gray-200 pb-2;
+  }
+}

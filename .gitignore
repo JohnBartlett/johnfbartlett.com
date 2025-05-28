@@ -1,0 +1,19 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+*.tar.gz
+
+# Security-related files
+.env
+.env.*
+*.pem
+*.key
+*.cert
+*.log
+coverage/
+.vscode/
+.idea/
+*.sqlite
+*.db
