@@ -18,22 +18,26 @@ const transporter = nodemailer.createTransport({
 
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    res.status(405).json({ error: 'Method Not Allowed' });
+    return;
   }
 
   try {
     const { name, company, email, phone, message, honey, privacy } = req.body;
 
     if (honey) {
-      return res.status(200).json({ message: 'Thanks for your submission.' });
+      // Honeypot detected
+      res.status(200).json({ message: 'Form submitted successfully (honeypot triggered).' });
+      return;
     }
 
-    if (!name || !email || !message || !company) {
-      return res.status(400).json({ error: 'Missing required fields.' });
+    if (!name || !company || !email || !message) {
+      res.status(400).json({ error: 'Missing required fields.' });
+      return;
     }
 
     const mailOptions = {
-      from: email,
+      from: `"${name}" <${email}>`,
       to: RECIPIENT_EMAIL,
       subject: `New Contact Form Submission from ${name}`,
       text: `
@@ -43,18 +47,14 @@ Email: ${email}
 Phone: ${phone || 'N/A'}
 Message: ${message}
 Privacy Accepted: ${privacy ? 'Yes' : 'No'}
-      `,
+`,
     };
 
-    const info = await transporter.sendMail(mailOptions);
+    await transporter.sendMail(mailOptions);
 
-    // Explicitly send success response
-    return res.status(200).json({
-      message: 'Message sent successfully!',
-      info: info.response || 'Email sent',
-    });
+    res.status(200).json({ message: 'Your message has been sent successfully.' });
   } catch (error: any) {
     console.error('Error sending email:', error);
-    return res.status(500).json({ error: error.message || 'Failed to send message.' });
+    res.status(500).json({ error: 'Internal Server Error.' });
   }
 }
