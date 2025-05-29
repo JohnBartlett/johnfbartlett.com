@@ -6,7 +6,7 @@ import NewsletterForm from '@/components/contact/NewsletterForm';
 const Contact = () => {
   useEffect(() => {
     // Update page title
-    document.title = "Contact Us | JF Bartlett & Associates";
+    document.title = "Contact Us | JF Bartlett & Associates (2025";
   }, []);
 
   return (
@@ -85,4 +85,4 @@ const Contact = () => {
 };
 
 export default Contact;
-<p className="text-xs text-gray-400 fixed bottom-2 right-4 z-50">Version: 0.1.3-dev</p>
+<p className="text-xs text-gray-400 fixed bottom-2 right-4 z-50">Version: 0.1.4-dev</p>
