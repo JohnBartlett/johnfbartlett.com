@@ -25,6 +25,7 @@ type ContactFormValues = z.infer<typeof contactFormSchema>;
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
+  const version = "v1.0.0"; // Replace with your actual version string
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -41,7 +42,7 @@ const ContactForm = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     if (data.honey) {
-      return; // Bot detected
+      return;
     }
 
     setIsSubmitting(true);
@@ -80,12 +81,11 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8">
+    <div className="bg-white rounded-lg shadow-md p-8 relative">
       <h2 className="text-xl font-bold text-primary mb-6">Schedule a Consultation</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-          {/* Honeypot hidden field */}
           <input type="text" {...form.register('honey')} style={{ display: 'none' }} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -195,6 +195,10 @@ const ContactForm = () => {
           </Button>
         </form>
       </Form>
+
+      <div className="absolute bottom-2 right-2 text-xs text-gray-400">
+        Version: {version}
+      </div>
     </div>
   );
 };
