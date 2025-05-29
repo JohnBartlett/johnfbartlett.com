@@ -25,6 +25,7 @@ export default async function handler(req: any, res: any) {
     const { name, company, email, phone, message, honey, privacy } = req.body;
 
     if (honey) {
+      // Honeypot triggered
       return res.status(200).json({ message: 'Thanks for your submission.' });
     }
 
@@ -32,45 +33,25 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: 'Missing required fields.' });
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ error: 'Invalid email format.' });
-    }
-
-    const phoneRegex = /^[0-9\s\-()+]*$/;
-    if (phone && !phoneRegex.test(phone)) {
-      return res.status(400).json({ error: 'Invalid phone format.' });
-    }
-
-    if (!privacy) {
-      return res.status(400).json({ error: 'Privacy agreement required.' });
-    }
-
     const mailOptions = {
-      from: `"${name}" <${email}>`,
+      from: email,
       to: RECIPIENT_EMAIL,
-      subject: `New Inquiry from ${name} (${company})`,
+      subject: `New Contact Form Submission from ${name}`,
       text: `
-        Name: ${name}
-        Company: ${company}
-        Email: ${email}
-        Phone: ${phone || 'N/A'}
-        Message: ${message}
-      `,
-      html: `
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>Company:</strong> ${company}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Phone:</strong> ${phone || 'N/A'}</p>
-        <p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>
-      `,
+Name: ${name}
+Company: ${company}
+Email: ${email}
+Phone: ${phone || 'N/A'}
+Message: ${message}
+Privacy Accepted: ${privacy ? 'Yes' : 'No'}
+`,
     };
 
     await transporter.sendMail(mailOptions);
 
-    res.status(200).json({ message: 'Message sent successfully!' });
-  } catch (error: any) {
-    console.error('Error sending email:', error);
-    res.status(500).json({ error: 'Internal server error. Please try again later.' });
+    return res.status(200).json({ message: 'Message sent successfully!' });
+  } catch (err: any) {
+    console.error('Error sending email:', err);
+    return res.status(500).json({ error: 'Failed to send message.' });
   }
 }
