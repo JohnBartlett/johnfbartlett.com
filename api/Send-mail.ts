@@ -16,8 +16,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-  export default async function handler(req: any, res: any) {
-
+export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method Not Allowed' });
   }
@@ -25,12 +24,10 @@ const transporter = nodemailer.createTransport({
   try {
     const { name, company, email, phone, message, honey, privacy } = req.body;
 
-    // Honeypot spam filter
     if (honey) {
       return res.status(200).json({ message: 'Thanks for your submission.' });
     }
 
-    // Basic validation
     if (!name || !email || !message || !company) {
       return res.status(400).json({ error: 'Missing required fields.' });
     }
@@ -38,6 +35,11 @@ const transporter = nodemailer.createTransport({
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({ error: 'Invalid email format.' });
+    }
+
+    const phoneRegex = /^[0-9\s\-()+]*$/;
+    if (phone && !phoneRegex.test(phone)) {
+      return res.status(400).json({ error: 'Invalid phone format.' });
     }
 
     if (!privacy) {
