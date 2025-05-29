@@ -14,7 +14,7 @@ const contactFormSchema = z.object({
   name: z.string().min(2, { message: 'Name must be at least 2 characters.' }),
   company: z.string().min(2, { message: 'Company name is required.' }),
   email: z.string().email({ message: 'Please enter a valid email address.' }),
-  phone: z.string().optional().or(z.literal('')).or(z.null()).or(z.undefined()),
+  phone: z.string().optional(),
   message: z.string().min(10, { message: 'Message must be at least 10 characters.' }),
   privacy: z.boolean().refine(val => val === true, { message: 'You must accept the Privacy Policy and Terms of Service.' }),
   honey: z.string().optional(), // Honeypot field
@@ -25,7 +25,6 @@ type ContactFormValues = z.infer<typeof contactFormSchema>;
 const ContactForm = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
-  const version = "v1.0.0"; // Replace with your actual version string
 
   const form = useForm<ContactFormValues>({
     resolver: zodResolver(contactFormSchema),
@@ -41,7 +40,10 @@ const ContactForm = () => {
   });
 
   const onSubmit = async (data: ContactFormValues) => {
+    console.log('Submitting form data:', data);
+
     if (data.honey) {
+      console.warn('Honeypot triggered, likely spam.');
       return;
     }
 
@@ -53,23 +55,23 @@ const ContactForm = () => {
         body: JSON.stringify(data),
       });
 
-      let resData;
-      try {
-        resData = await response.json();
-      } catch {
-        resData = { error: 'Unexpected response from server.' };
-      }
+      console.log('Raw response:', response);
+
+      const resData = await response.json().catch(() => ({ error: 'Invalid JSON response from server' }));
+      console.log('Parsed response data:', resData);
 
       if (!response.ok) {
-        throw new Error(resData.error || 'Unknown error');
+        throw new Error(resData.error || 'Unknown error occurred.');
       }
 
       toast({
         title: 'Success!',
         description: resData.message || 'Your message has been sent. We will contact you shortly.',
       });
+
       form.reset();
     } catch (error: any) {
+      console.error('Error during form submission:', error);
       toast({
         title: 'Error',
         description: error.message || 'There was a problem sending your message. Please try again.',
@@ -81,11 +83,12 @@ const ContactForm = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-8 relative">
+    <div className="bg-white rounded-lg shadow-md p-8">
       <h2 className="text-xl font-bold text-primary mb-6">Schedule a Consultation</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+          {/* Honeypot hidden field */}
           <input type="text" {...form.register('honey')} style={{ display: 'none' }} />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -154,7 +157,7 @@ const ContactForm = () => {
                 <FormLabel>Brief description of your interest or challenges *</FormLabel>
                 <FormControl>
                   <Textarea
-                    placeholder="Please tell us about your business and what you're looking to achieve with AI"
+                    placeholder="Tell us about your business and what you're looking to achieve with AI"
                     className="resize-none"
                     rows={5}
                     {...field}
@@ -191,14 +194,12 @@ const ContactForm = () => {
             className="bg-primary hover:bg-primary-light text-white py-3 px-8 rounded-md transition"
             disabled={isSubmitting}
           >
-            {isSubmitting ? "Submitting..." : "Submit Request"}
+            {isSubmitting ? 'Submitting...' : 'Submit Request'}
           </Button>
         </form>
       </Form>
 
-      <div className="absolute bottom-2 right-2 text-xs text-gray-400">
-        Version: {version}
-      </div>
+      <p className="text-sm text-gray-400 mt-4 text-right">Version: v1.0.0</p>
     </div>
   );
 };
