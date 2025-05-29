@@ -25,8 +25,7 @@ export default async function handler(req: any, res: any) {
     const { name, company, email, phone, message, honey, privacy } = req.body;
 
     if (honey) {
-      // Honeypot triggered
-      return res.status(200).json({ message: 'Submission received.' });
+      return res.status(200).json({ message: 'Thanks for your submission.' });
     }
 
     if (!name || !email || !message || !company) {
@@ -44,14 +43,18 @@ Email: ${email}
 Phone: ${phone || 'N/A'}
 Message: ${message}
 Privacy Accepted: ${privacy ? 'Yes' : 'No'}
-`,
+      `,
     };
 
-    await transporter.sendMail(mailOptions);
+    const info = await transporter.sendMail(mailOptions);
 
-    return res.status(200).json({ message: 'Message sent successfully!' });
-  } catch (err: any) {
-    console.error('Error sending email:', err);
-    return res.status(500).json({ error: 'Internal server error.' });
+    // Explicitly send success response
+    return res.status(200).json({
+      message: 'Message sent successfully!',
+      info: info.response || 'Email sent',
+    });
+  } catch (error: any) {
+    console.error('Error sending email:', error);
+    return res.status(500).json({ error: error.message || 'Failed to send message.' });
   }
 }
