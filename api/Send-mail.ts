@@ -26,7 +26,7 @@ export default async function handler(req: any, res: any) {
 
     if (honey) {
       // Honeypot triggered
-      return res.status(200).json({ message: 'Thanks for your submission.' });
+      return res.status(200).json({ message: 'Submission received.' });
     }
 
     if (!name || !email || !message || !company) {
@@ -52,6 +52,6 @@ Privacy Accepted: ${privacy ? 'Yes' : 'No'}
     return res.status(200).json({ message: 'Message sent successfully!' });
   } catch (err: any) {
     console.error('Error sending email:', err);
-    return res.status(500).json({ error: 'Failed to send message.' });
+    return res.status(500).json({ error: 'Internal server error.' });
   }
 }
