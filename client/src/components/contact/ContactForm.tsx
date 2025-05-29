@@ -41,8 +41,7 @@ const ContactForm = () => {
 
   const onSubmit = async (data: ContactFormValues) => {
     if (data.honey) {
-      // Bot detected, silently fail
-      return;
+      return; // Bot detected
     }
 
     setIsSubmitting(true);
@@ -53,21 +52,27 @@ const ContactForm = () => {
         body: JSON.stringify(data),
       });
 
+      let resData;
+      try {
+        resData = await response.json();
+      } catch {
+        resData = { error: 'Unexpected response from server.' };
+      }
+
       if (!response.ok) {
-        const resData = await response.json();
         throw new Error(resData.error || 'Unknown error');
       }
 
       toast({
-        title: "Success!",
-        description: "Your message has been sent. We will contact you shortly.",
+        title: 'Success!',
+        description: resData.message || 'Your message has been sent. We will contact you shortly.',
       });
       form.reset();
     } catch (error: any) {
       toast({
-        title: "Error",
-        description: error.message || "There was a problem sending your message. Please try again.",
-        variant: "destructive",
+        title: 'Error',
+        description: error.message || 'There was a problem sending your message. Please try again.',
+        variant: 'destructive',
       });
     } finally {
       setIsSubmitting(false);
